@@ -33,7 +33,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion:
     proration_behavior: 'none',
     billing_cycle_anchor,
   });
-
   const updatePrice = await stripe.prices.create({
     unit_amount: 11000,
     currency: 'jpy',
@@ -41,14 +40,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion:
     recurring: { interval: 'month' },
   });
 
+  const cancel_at = moment().add({ months: 2 }).startOf('month').unix();
   await stripe.subscriptions.update(subscription.id, {
     proration_behavior: 'none',
-    cancel_at_period_end: true,
+    //cancel_at_period_end: true,
+    cancel_at,
   });
 
-  await stripe.subscriptionSchedules.create({
-    from_subscription: subscription.id,
-  });
+  //await stripe.subscriptionSchedules.create({
+  //  from_subscription: subscription.id,
+  //});
 
   const start_date = moment().add({ months: 2 }).startOf('month').unix();
   const suchedule = await stripe.subscriptionSchedules.create({
